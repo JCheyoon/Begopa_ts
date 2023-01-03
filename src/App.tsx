@@ -1,25 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./Routes/Home";
+import Recipe from "./Routes/Recipe";
+import Authentication from "./Routes/Authentication";
+import MyRecipes from "./Routes/MyRecipes";
+import SubmitRecipe from "./Routes/SubmitRecipe";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="auth" element={<Authentication />} />
+        <Route path="recipe/:id" element={<Recipe />} />
+        <Route path="submit" element={<SubmitRecipe />} />
+        <Route path="edit/:id" element={<SubmitRecipe isEditMode={true} />} />
+        <Route path="my-recipes" element={<MyRecipes />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
