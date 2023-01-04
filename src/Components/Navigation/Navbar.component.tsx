@@ -1,3 +1,4 @@
+import { FormEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -7,23 +8,24 @@ import {
   NavLink,
   NavButton,
 } from "./Navbar.style";
+import { useContextRecipe } from "../../Context/recipeContext";
 
 const Navbar = () => {
   // const { isLoggedIn, handleLogout } = useContextAuth();
-  const [searchField, setSearchField] = useState("");
-  // const { filterByName } = useContextRecipe();
+  const [searchField, setSearchField] = useState<string>("");
+  const { filterByName } = useContextRecipe();
   const location = useLocation();
 
-  const onSearchChange = (e: InputEvent) => {
+  const onSearchChange = (e: FormEvent<HTMLInputElement>) => {
     const searchFieldString = (
       e.target as HTMLInputElement
     )?.value.toLowerCase();
-    // setSearchField(searchFieldString);
+    setSearchField(searchFieldString);
   };
 
-  const handleKeyPress = (e: KeyboardEvent) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // filterByName(searchField);
+      filterByName(searchField);
     }
   };
 
@@ -35,12 +37,12 @@ const Navbar = () => {
           <input
             type="text"
             placeholder="Find a recipe..."
-            // onChange={onSearchChange}
-            // onKeyUp={handleKeyPress}
+            onChange={onSearchChange}
+            onKeyUp={handleKeyPress}
           />
-          {/*<button type="submit" onClick={() => filterByName(searchField)}>*/}
-          {/*  <span className="material-symbols-outlined">search</span>*/}
-          {/*</button>*/}
+          <button type="submit" onClick={() => filterByName(searchField)}>
+            <span className="material-symbols-outlined">search</span>
+          </button>
         </SearchContainer>
       ) : (
         <EmptyDiv />
