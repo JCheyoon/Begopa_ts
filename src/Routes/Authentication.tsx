@@ -1,7 +1,7 @@
 const Auth = () => {
   return (
     <>
-      <h1>home</h1>
+      <h1>login</h1>
     </>
   );
 };

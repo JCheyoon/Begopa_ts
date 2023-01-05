@@ -9,9 +9,10 @@ import {
   NavButton,
 } from "./Navbar.style";
 import { useContextRecipe } from "../../Context/recipeContext";
+import { useContextAuth } from "../../Context/authContext";
 
 const Navbar = () => {
-  // const { isLoggedIn, handleLogout } = useContextAuth();
+  const { isLoggedIn, handleLogout } = useContextAuth();
   const [searchField, setSearchField] = useState<string>("");
   const { filterByName } = useContextRecipe();
   const location = useLocation();
@@ -48,27 +49,27 @@ const Navbar = () => {
         <EmptyDiv />
       )}
 
-      {/*{isLoggedIn ? (*/}
-      {/*  <>*/}
-      {/*    <NavLink to="/submit">*/}
-      {/*      <span className="material-symbols-outlined">description</span>*/}
-      {/*      <span>Submit Recipe</span>*/}
-      {/*    </NavLink>*/}
-      {/*    <NavLink to="/my-recipes">*/}
-      {/*      <span className="material-symbols-outlined">favorite</span>*/}
-      {/*      <span>My Recipes</span>*/}
-      {/*    </NavLink>*/}
-      {/*    <NavButton onClick={handleLogout}>*/}
-      {/*      <span className="material-symbols-outlined">lock</span>*/}
-      {/*      <span>Logout</span>*/}
-      {/*    </NavButton>*/}
-      {/*  </>*/}
-      {/*) : (*/}
-      {/*  <NavLink to="/auth">*/}
-      {/*    <span className="material-symbols-outlined">lock</span>*/}
-      {/*    <span>Login</span>*/}
-      {/*  </NavLink>*/}
-      {/*)}*/}
+      {isLoggedIn ? (
+        <>
+          <NavLink to="/submit">
+            <span className="material-symbols-outlined">description</span>
+            <span>Submit Recipe</span>
+          </NavLink>
+          <NavLink to="/my-recipes">
+            <span className="material-symbols-outlined">favorite</span>
+            <span>My Recipes</span>
+          </NavLink>
+          <NavButton onClick={handleLogout}>
+            <span className="material-symbols-outlined">lock</span>
+            <span>Logout</span>
+          </NavButton>
+        </>
+      ) : (
+        <NavLink to="/auth">
+          <span className="material-symbols-outlined">lock</span>
+          <span>Login</span>
+        </NavLink>
+      )}
     </NavbarContainer>
   );
 };

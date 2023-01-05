@@ -1,6 +1,16 @@
 export type UUID = string;
 export type Date = string;
 
+export type TokenResponse = {
+  token: string;
+  expiresAt: number;
+};
+
+export interface LoginResponse extends TokenResponse {
+  email: string;
+  id: UUID;
+}
+
 export type Ingredient = {
   amount: number;
   unit: string;

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAxios } from "../Components/Hook/useAxios";
-import { Recipe } from "./RecipeType";
+import { Recipe } from "./Types";
 
 type RecipeContextType = {
   fetchAllRecipes: () => Promise<void>;
