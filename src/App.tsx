@@ -7,12 +7,14 @@ import MyRecipes from "./Routes/MyRecipes";
 import SubmitRecipe from "./Routes/SubmitRecipe";
 import { AuthProvider } from "./Context/authContext";
 import { RecipeProvider } from "./Context/recipeContext";
+import Navigation from "./Components/Navigation/Navigation.component";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <RecipeProvider>
+          <Navigation />
           <Routes>
             <Route index element={<Home />} />
             <Route path="auth" element={<Authentication />} />

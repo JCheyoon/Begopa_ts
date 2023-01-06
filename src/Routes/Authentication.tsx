@@ -1,9 +1,16 @@
-const Auth = () => {
+import { AuthenticationContainer } from "./Authentication.style";
+import { Page } from "../Components/Page/Page.style";
+
+import SignInForm from "../Components/SignIn/SignInForm.component";
+
+const Authentication = () => {
   return (
-    <>
-      <h1>login</h1>
-    </>
+    <Page>
+      <AuthenticationContainer>
+        <SignInForm />
+      </AuthenticationContainer>
+    </Page>
   );
 };
 
-export default Auth;
+export default Authentication;
