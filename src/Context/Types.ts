@@ -1,5 +1,10 @@
 export type UUID = string;
-export type Date = string;
+export type DateString = string;
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
 
 export type TokenResponse = {
   token: string;
@@ -19,7 +24,7 @@ export type Ingredient = {
 
 export interface Recipe {
   id: UUID;
-  updatedAt: Date;
+  updatedAt: DateString;
   userId: UUID;
   public: boolean;
   name: string;

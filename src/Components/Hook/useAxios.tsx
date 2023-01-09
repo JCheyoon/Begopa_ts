@@ -14,7 +14,7 @@ export const useAxios = () => {
     );
   };
 
-  const post = (path: string, data: string, token: string): any => {
+  function post<T>(path: string, data: T, token?: string): any {
     return axios.post(
       `${BASE_URL}${path}`,
       data,
@@ -24,7 +24,7 @@ export const useAxios = () => {
           }
         : undefined
     );
-  };
+  }
 
   const put = (path: string, data: string, token: string): any => {
     return axios.put(

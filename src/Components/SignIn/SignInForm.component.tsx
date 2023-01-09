@@ -3,8 +3,12 @@ import { Button } from "../Page/Page.style";
 
 import FormInput from "./FormInput.component";
 import { FormEvent, useState } from "react";
+import { useAxios } from "../Hook/useAxios";
+import { useContextAuth } from "../../Context/authContext";
+import { useNavigate } from "react-router-dom";
+import { LoginRequest } from "../../Context/Types";
 
-const defaultFormValue = {
+const defaultFormValue: LoginRequest = {
   email: "",
   password: "",
 };
@@ -14,20 +18,54 @@ enum FormType {
 }
 
 const SignInForm = () => {
-  const [formFields, setFormFields] = useState(defaultFormValue);
+  const { post } = useAxios();
+  const { handleLogin } = useContextAuth();
+  const [formFields, setFormFields] = useState<LoginRequest>(defaultFormValue);
   const [formType, setFormType] = useState(FormType.LOGIN);
   const [confirmPassword, setConfirmPassword] = useState("");
   const { email, password } = formFields;
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    if (formType === FormType.LOGIN) {
+      try {
+        const response = await post<LoginRequest>("/user/login", formFields);
+        handleLogin(response.data);
+        navigate("/");
+      } catch (e) {
+        console.log(e);
+      }
+    } else if (formType === FormType.SIGNUP) {
+      try {
+        const response = await post<LoginRequest>("/user/signup", formFields);
+        setFormType(FormType.LOGIN);
+        resetForm();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
     const { name, value } = e.target as HTMLInputElement;
     setFormFields({ ...formFields, [name]: value });
   };
 
+  const changeForm = () => {
+    setFormType(formType === FormType.LOGIN ? FormType.SIGNUP : FormType.LOGIN);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setFormFields({ email: "", password: "" });
+    setConfirmPassword("");
+  };
+
   return (
     <SignInFormContainer>
       <h1>WELCOME</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <FormInput
           label="Email"
           type="email"
@@ -73,6 +111,11 @@ const SignInForm = () => {
           </Button>
         </SignInButtonContainer>
       </form>
+      <span onClick={changeForm}>
+        {formType === FormType.LOGIN
+          ? "Don't have an account? Sign up"
+          : "Already have an account? Log in"}
+      </span>
     </SignInFormContainer>
   );
 };
