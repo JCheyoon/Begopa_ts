@@ -10,6 +10,7 @@ type AuthContextType = {
   handleLogin: (loginResponse: LoginResponse) => void;
   handleLogout: () => void;
   isLoggedIn: boolean;
+  token: string | undefined;
 };
 
 type ProviderProps = {
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }: ProviderProps) => {
     handleLogin,
     handleLogout,
     isLoggedIn,
+    token,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

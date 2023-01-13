@@ -7,11 +7,22 @@ import {
   SubmitRecipeInput,
   SubmitRecipeSection,
 } from "./SubmitRecipe.style";
-import { Formik } from "formik";
-import { Ingredient } from "../Context/Types";
-import { useRef, useState } from "react";
+import { Formik, FormikProps } from "formik";
+import { Ingredient, Recipe } from "../Context/Types";
+import { Ref, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useContextRecipe } from "../Context/recipeContext";
+import { useAxios } from "../Components/Hook/useAxios";
+
 interface Props {
   isEditMode?: Boolean;
+}
+function fixValues(values: Recipe) {
+  const copy = { ...values };
+  copy.tags = copy.tags.map(
+    (tag) => tag.charAt(0).toUpperCase() + tag.slice(1)
+  );
+  return copy;
 }
 const initialIngredient: Ingredient = { amount: 0, unit: "", material: "" };
 
@@ -24,14 +35,74 @@ const initialValues = {
   instructions: "",
   tags: [""],
   ingredients: [{ ...initialIngredient }],
-};
+} as unknown as Recipe;
 
 const SubmitRecipe = ({ isEditMode }: Props) => {
+  const { id } = useParams();
+  const { get } = useAxios();
   const [loading, setLoading] = useState<boolean>(false);
-  const formRef = useRef(null);
+  const formRef = useRef<FormikProps<Recipe>>(null);
+  const navigate = useNavigate();
+  const [fetchedRecipe, setFetchedRecipe] = useState();
+  const { saveNewRecipe, updateRecipe } = useContextRecipe();
 
-  const submitForm = () => {
-    console.log("submit");
+  useEffect(() => {
+    if (!id || !isEditMode) return;
+    const query = new URLSearchParams(search);
+    const isPublic = query.get("public") === "true";
+    fetchRecipe(id, isPublic);
+  }, [id]);
+
+  useEffect(() => {
+    if (!formRef?.current || !fetchedRecipe) return;
+    formRef.current.resetForm({
+      values: {
+        name: fetchedRecipe.name,
+        photoUrl: fetchedRecipe.photoUrl,
+        cookingTime: fetchedRecipe.cookingTime,
+        servings: fetchedRecipe.servings,
+        public: fetchedRecipe.public,
+        instructions: fetchedRecipe.instructions,
+        tags: fetchedRecipe.tags,
+        ingredients: fetchedRecipe.ingredients,
+      },
+    });
+  }, [fetchedRecipe]);
+
+  const fetchRecipe = async (id: string, isPublic: boolean, token: string) => {
+    setLoading(true);
+    try {
+      const response = await get(
+        `/recipe/${isPublic ? "" : "private/"}${id}`,
+        token
+      );
+      setFetchedRecipe(response.data);
+    } catch (e) {
+      console.log(e.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitForm = async (values: Recipe) => {
+    if (!formRef?.current) return;
+
+    setLoading(true);
+    const fixedValues = fixValues(values);
+
+    try {
+      let response;
+      if (isEditMode) {
+        response = await updateRecipe(fixedValues, id);
+      } else {
+        response = await saveNewRecipe(fixedValues, id);
+      }
+      navigate(`/recipe/${response.data.id}?public=${values.public}`);
+    } catch (e) {
+      console.log("error", e.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const removeIngredientHandler = (index: number) => {
@@ -42,10 +113,26 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
     setFieldValue("ingredients", newIngredients);
   };
 
-  const addIngredientHandler = () => {};
-  const removeTagHandler = (index) => {};
+  const addIngredientHandler = () => {
+    if (!formRef?.current) return;
+    const { values, setFieldValue } = formRef.current;
+    const newIngredients = [...values.ingredients, { ...initialIngredient }];
+    setFieldValue("ingredients", newIngredients);
+  };
+  const removeTagHandler = (index: number) => {
+    if (!formRef?.current) return;
+    const { values, setFieldValue } = formRef.current;
+    const newTags = [...values.tags];
+    newTags.splice(index, 1);
+    setFieldValue("tags", newTags);
+  };
 
-  const addTagHandler = () => {};
+  const addTagHandler = () => {
+    if (!formRef?.current) return;
+    const { values, setFieldValue } = formRef.current;
+    const newTags = [...values.tags, ""];
+    setFieldValue("tags", newTags);
+  };
 
   return (
     <Page>
@@ -53,7 +140,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         <Formik
           initialValues={initialValues}
           onSubmit={submitForm}
-          innerRef={formRef}
+          innerRef={formRef as unknown as Ref<FormikProps<Recipe>>}
         >
           {({
             values,
@@ -134,7 +221,8 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
                         touched?.ingredients &&
                         touched.ingredients[index]?.material &&
                         errors?.ingredients &&
-                        (errors.ingredients[index] as any)?.material
+                        (errors.ingredients[index] as unknown as Ingredient)
+                          ?.material
                           ? "error"
                           : ""
                       }
@@ -150,7 +238,8 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
                         touched?.ingredients &&
                         touched.ingredients[index]?.amount &&
                         errors?.ingredients &&
-                        (errors.ingredients[index] as any)?.amount
+                        (errors.ingredients[index] as unknown as Ingredient)
+                          ?.amount
                           ? "error"
                           : ""
                       }
@@ -166,7 +255,8 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
                         touched?.ingredients &&
                         touched.ingredients[index]?.unit &&
                         errors?.ingredients &&
-                        (errors.ingredients[index] as any)?.unit
+                        (errors.ingredients[index] as unknown as Ingredient)
+                          ?.unit
                           ? "error"
                           : ""
                       }
@@ -200,7 +290,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
                       touched.instructions && errors.instructions ? "error" : ""
                     }
                     placeholder="Ex) 1.prepare vegetables"
-                    rows="20"
+                    rows={20}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     name="instructions"
