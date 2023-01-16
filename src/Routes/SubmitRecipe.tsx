@@ -10,7 +10,7 @@ import {
 import { Formik, FormikProps } from "formik";
 import { Ingredient, Recipe } from "../Context/Types";
 import { Ref, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useContextRecipe } from "../Context/recipeContext";
 import { useAxios } from "../Components/Hook/useAxios";
 
@@ -39,11 +39,12 @@ const initialValues = {
 
 const SubmitRecipe = ({ isEditMode }: Props) => {
   const { id } = useParams();
+  const { search } = useLocation();
   const { get } = useAxios();
   const [loading, setLoading] = useState<boolean>(false);
   const formRef = useRef<FormikProps<Recipe>>(null);
   const navigate = useNavigate();
-  const [fetchedRecipe, setFetchedRecipe] = useState();
+  const [fetchedRecipe, setFetchedRecipe] = useState<Recipe>();
   const { saveNewRecipe, updateRecipe } = useContextRecipe();
 
   useEffect(() => {
@@ -65,11 +66,11 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         instructions: fetchedRecipe.instructions,
         tags: fetchedRecipe.tags,
         ingredients: fetchedRecipe.ingredients,
-      },
+      } as Recipe,
     });
   }, [fetchedRecipe]);
 
-  const fetchRecipe = async (id: string, isPublic: boolean, token: string) => {
+  const fetchRecipe = async (id: string, isPublic: boolean, token?: string) => {
     setLoading(true);
     try {
       const response = await get(
@@ -77,29 +78,8 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         token
       );
       setFetchedRecipe(response.data);
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.response.data.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitForm = async (values: Recipe) => {
-    if (!formRef?.current) return;
-
-    setLoading(true);
-    const fixedValues = fixValues(values);
-
-    try {
-      let response;
-      if (isEditMode) {
-        response = await updateRecipe(fixedValues, id);
-      } else {
-        response = await saveNewRecipe(fixedValues, id);
-      }
-      navigate(`/recipe/${response.data.id}?public=${values.public}`);
-    } catch (e) {
-      console.log("error", e.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -132,6 +112,27 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
     const { values, setFieldValue } = formRef.current;
     const newTags = [...values.tags, ""];
     setFieldValue("tags", newTags);
+  };
+
+  const submitForm = async (values: Recipe) => {
+    if (!formRef?.current) return;
+
+    setLoading(true);
+    const fixedValues = fixValues(values);
+
+    try {
+      let response;
+      if (isEditMode) {
+        response = await updateRecipe(fixedValues, id);
+      } else {
+        response = await saveNewRecipe(fixedValues, id);
+      }
+      navigate(`/recipe/${response.data.id}?public=${values.public}`);
+    } catch (e: any) {
+      console.log("error", e.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

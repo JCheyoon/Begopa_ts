@@ -4,7 +4,7 @@ import { Recipe } from "../../Context/Types";
 export const useAxios = () => {
   const BASE_URL = process.env.REACT_APP_API_URL;
 
-  const get = (path: string, token: string): any => {
+  const get = (path: string, token?: string): any => {
     return axios.get(
       `${BASE_URL}${path}`,
       token
