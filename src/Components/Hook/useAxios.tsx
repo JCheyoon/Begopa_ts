@@ -1,5 +1,5 @@
 import { default as axios } from "axios";
-import { Recipe } from "../../Context/Types";
+import { RecipeType } from "../../Context/Types";
 
 export const useAxios = () => {
   const BASE_URL = process.env.REACT_APP_API_URL;
@@ -27,7 +27,7 @@ export const useAxios = () => {
     );
   }
 
-  const put = (path: string, data: Recipe, token: string): any => {
+  const put = (path: string, data: RecipeType, token: string): any => {
     return axios.put(
       `${BASE_URL}${path}`,
       data,

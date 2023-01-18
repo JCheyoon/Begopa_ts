@@ -1,29 +1,37 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAxios } from "../Components/Hook/useAxios";
-import { Recipe } from "./Types";
+import { RecipeType, Tags } from "./Types";
 import { useContextAuth } from "./authContext";
 
 type RecipeContextType = {
-  allRecipes: Recipe[];
+  allRecipes: RecipeType[];
   fetchAllRecipes: () => Promise<void>;
   filterByName: (searchField: string) => void;
   saveNewRecipe: (
-    recipeData: Recipe,
+    recipeData: RecipeType,
     recipeId: string | undefined
   ) => Promise<any>;
   updateRecipe: (
-    recipeData: Recipe,
+    recipeData: RecipeType,
     recipeId: string | undefined
   ) => Promise<any>;
-  getRelatedRecipes: (tags: string[], id: string) => Recipe[];
+  getRelatedRecipes: (tags: string[], id: string) => RecipeType[];
+  fetchInitialRecipes: () => Promise<void>;
 };
 
 type ProviderProps = {
   children: React.ReactNode;
 };
 
-function createTags(recipes) {
-  const tagsOccurrence = {};
+// const a: Record<string, number> = {
+//   asd: 1,
+//   dsa: 322,
+//   fasd: true,
+// }
+
+function createTags(recipes: RecipeType[]) {
+  const tagsOccurrence: Record<string, number> = {};
+
   recipes.forEach(({ tags }) => {
     tags.forEach((tag) => {
       if (!tagsOccurrence[tag]) {
@@ -47,9 +55,12 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
   const { token, isLoggedIn } = useContextAuth();
   const [myRecipes, setMyRecipes] = useState([]);
   const { post, get, put, remove } = useAxios();
-  const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
-  const [tags, setTags] = useState({ frequents: [], others: [] });
+  const [allRecipes, setAllRecipes] = useState<RecipeType[]>([]);
+  const [filteredRecipes, setFilteredRecipes] = useState<RecipeType[]>([]);
+  const [tags, setTags] = useState<Tags>({
+    frequents: [],
+    others: [],
+  });
 
   const fetchInitialRecipes = async () => {
     const response = await get("/recipe/list");
@@ -74,12 +85,18 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     setFilteredRecipes(filtered);
   };
 
-  const saveNewRecipe = (recipeData: Recipe, recipeId: string | undefined) => {
+  const saveNewRecipe = (
+    recipeData: RecipeType,
+    recipeId: string | undefined
+  ) => {
     if (!token) return;
     return post("/recipe", recipeData, token);
   };
 
-  const updateRecipe = (recipeData: Recipe, recipeId: string | undefined) => {
+  const updateRecipe = (
+    recipeData: RecipeType,
+    recipeId: string | undefined
+  ) => {
     if (!token) return;
     return put(`/recipe/${recipeId}`, recipeData, token);
   };
@@ -98,6 +115,7 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     updateRecipe,
     getRelatedRecipes,
     allRecipes,
+    fetchInitialRecipes,
   };
 
   return (

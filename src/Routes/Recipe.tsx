@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import Footer from "../Components/Footer/Footer.component";
 import { useContextAuth } from "../Context/authContext";
 import RecipeHeader from "../Components/RecipeItems/RecipeHeader.component";
+import Spinner from "../Components/Spinner/Spinner.component";
+import { RecipeType } from "../Context/Types";
 
 const Recipe = () => {
   const { id } = useParams();
@@ -15,7 +17,7 @@ const Recipe = () => {
   const { get } = useAxios();
   const { allRecipes, fetchInitialRecipes } = useContextRecipe();
   const { token } = useContextAuth();
-  const [recipe, setRecipe] = useState();
+  const [recipe, setRecipe] = useState<RecipeType>();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

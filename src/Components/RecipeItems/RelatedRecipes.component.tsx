@@ -7,7 +7,7 @@ import {
 import { useContextRecipe } from "../../Context/recipeContext";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Recipe } from "../../Context/Types";
+import { RecipeType } from "../../Context/Types";
 
 type Props = {
   tags: string[];
@@ -15,7 +15,7 @@ type Props = {
 };
 const RelatedRecipes = ({ tags, id }: Props) => {
   const { getRelatedRecipes } = useContextRecipe();
-  const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
+  const [relatedRecipes, setRelatedRecipes] = useState<RecipeType[]>([]);
 
   useEffect(() => {
     setRelatedRecipes(getRelatedRecipes(tags, id));

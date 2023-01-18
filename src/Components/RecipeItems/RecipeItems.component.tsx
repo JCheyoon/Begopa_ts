@@ -13,7 +13,7 @@ import {
   Time,
 } from "./RecipeItems.style";
 import { useState } from "react";
-import { Recipe } from "../../Context/Types";
+import { RecipeType } from "../../Context/Types";
 import RelatedRecipes from "./RelatedRecipes.component";
 
 const RecipeItems = ({
@@ -25,7 +25,7 @@ const RecipeItems = ({
   servings,
   tags,
   id,
-}: Recipe) => {
+}: RecipeType) => {
   const [servingValue, setServingValue] = useState(servings);
   const [multiplier, setMultiplier] = useState(1);
 

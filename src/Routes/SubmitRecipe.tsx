@@ -8,7 +8,7 @@ import {
   SubmitRecipeSection,
 } from "./SubmitRecipe.style";
 import { Formik, FormikProps } from "formik";
-import { Ingredient, Recipe } from "../Context/Types";
+import { Ingredient, RecipeType } from "../Context/Types";
 import { Ref, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useContextRecipe } from "../Context/recipeContext";
@@ -17,7 +17,7 @@ import { useAxios } from "../Components/Hook/useAxios";
 interface Props {
   isEditMode?: Boolean;
 }
-function fixValues(values: Recipe) {
+function fixValues(values: RecipeType) {
   const copy = { ...values };
   copy.tags = copy.tags.map(
     (tag) => tag.charAt(0).toUpperCase() + tag.slice(1)
@@ -35,16 +35,16 @@ const initialValues = {
   instructions: "",
   tags: [""],
   ingredients: [{ ...initialIngredient }],
-} as unknown as Recipe;
+} as unknown as RecipeType;
 
 const SubmitRecipe = ({ isEditMode }: Props) => {
   const { id } = useParams();
   const { search } = useLocation();
   const { get } = useAxios();
   const [loading, setLoading] = useState<boolean>(false);
-  const formRef = useRef<FormikProps<Recipe>>(null);
+  const formRef = useRef<FormikProps<RecipeType>>(null);
   const navigate = useNavigate();
-  const [fetchedRecipe, setFetchedRecipe] = useState<Recipe>();
+  const [fetchedRecipe, setFetchedRecipe] = useState<RecipeType>();
   const { saveNewRecipe, updateRecipe } = useContextRecipe();
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         instructions: fetchedRecipe.instructions,
         tags: fetchedRecipe.tags,
         ingredients: fetchedRecipe.ingredients,
-      } as Recipe,
+      } as RecipeType,
     });
   }, [fetchedRecipe]);
 
@@ -114,7 +114,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
     setFieldValue("tags", newTags);
   };
 
-  const submitForm = async (values: Recipe) => {
+  const submitForm = async (values: RecipeType) => {
     if (!formRef?.current) return;
 
     setLoading(true);
@@ -141,7 +141,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         <Formik
           initialValues={initialValues}
           onSubmit={submitForm}
-          innerRef={formRef as unknown as Ref<FormikProps<Recipe>>}
+          innerRef={formRef as unknown as Ref<FormikProps<RecipeType>>}
         >
           {({
             values,
