@@ -31,12 +31,35 @@ export interface RecipeType {
   id: UUID;
   updatedAt: DateString;
   userId?: UUID;
-  public?: boolean;
+  isPublic?: boolean;
   name: string;
   photoUrl: string;
   instructions: string;
   tags: string[];
   servings: number;
   cookingTime: string;
+  ingredients: Ingredient[];
+  isMyRecipe?: boolean;
+}
+
+export interface RecentRecipeType {
+  id: UUID;
+  isPublic?: boolean;
+  name: string;
+  photoUrl: string;
+  tags: string[];
+  cookingTime: string;
+  isMyRecipe: boolean | undefined;
+}
+
+export interface MyRecipeType {
+  name: string;
+  photoUrl: string;
+  cookingTime: string;
+  tags: string[];
+  id: UUID;
+  updatedAt: string;
+  instructions: string;
+  servings: number;
   ingredients: Ingredient[];
 }

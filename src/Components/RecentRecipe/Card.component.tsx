@@ -9,26 +9,20 @@ import {
 } from "./Card.style";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { RecentRecipeType } from "../../Context/Types";
+import { useContextRecipe } from "../../Context/recipeContext";
 
-interface props {
-  recipeName: string;
-  imgUrl: string;
-  time: string;
-  tags: string;
-  recipeId: string;
-  isMyRecipe: boolean;
-  isPublic: boolean;
-}
 const Card = ({
-  recipeName,
-  imgUrl,
-  time,
+  name,
+  photoUrl,
+  cookingTime,
   tags,
-  recipeId,
+  id,
   isMyRecipe,
   isPublic,
-}: props) => {
+}: RecentRecipeType) => {
   const navigate = useNavigate();
+  const { deleteRecipe, fetchMyRecipes } = useContextRecipe();
 
   const clickRemoveHandler = () => {
     console.log("remove");
@@ -39,48 +33,48 @@ const Card = ({
     // });
   };
 
-  // const removeRecipe = async () => {
-  //   try {
-  //     await deleteRecipe(recipeId);
-  //     fetchMyRecipes();
-  //   } catch (e) {
-  //     console.log("error", e.response.data.message);
-  //   }
-  // };
+  const removeRecipe = async () => {
+    try {
+      await deleteRecipe(id);
+      fetchMyRecipes();
+    } catch (e: any) {
+      console.log("error", e.response.data.message);
+    }
+  };
 
   const goEditModeHandler = () => {
-    navigate(`/edit/${recipeId}?public=${isPublic}`);
+    navigate(`/edit/${id}?public=${isPublic}`);
   };
 
   return (
     <CardWrapper>
-      <Link to={`/recipe/${recipeId}?public=${isPublic}`}>
-        <CardImg imgUrl={imgUrl} />
+      <Link to={`/recipe/${id}?public=${isPublic}`}>
+        <CardImg imgUrl={photoUrl} />
       </Link>
 
       <CardDescription>
-        <Link to={`/recipe/${recipeId}?public=${isPublic}`}>
-          <h1>{recipeName}</h1>
+        <Link to={`/recipe/${id}?public=${isPublic}`}>
+          <h1>{name}</h1>
         </Link>
         <CardTime>
           <span className="material-symbols-outlined">timer</span>
-          <h2>{time}</h2>
+          <h2>{cookingTime}</h2>
         </CardTime>
-        {/*{tags.map((tag) => (*/}
-        {/*  <span className="tag" key={tag}>*/}
-        {/*    {tag}*/}
-        {/*  </span>*/}
-        {/*))}*/}
-        {/*{isMyRecipe === true ? (*/}
-        {/*  <IconContainer>*/}
-        {/*    <EditButton onClick={goEditModeHandler}>*/}
-        {/*      <span className="material-symbols-outlined">edit</span>*/}
-        {/*    </EditButton>*/}
-        {/*    <DeleteButton onClick={clickRemoveHandler}>*/}
-        {/*      <span className="material-symbols-outlined">delete</span>*/}
-        {/*    </DeleteButton>*/}
-        {/*  </IconContainer>*/}
-        {/*) : null}*/}
+        {tags.map((tag) => (
+          <span className="tag" key={tag}>
+            {tag}
+          </span>
+        ))}
+        {isMyRecipe ? (
+          <IconContainer>
+            <EditButton onClick={goEditModeHandler}>
+              <span className="material-symbols-outlined">edit</span>
+            </EditButton>
+            <DeleteButton onClick={clickRemoveHandler}>
+              <span className="material-symbols-outlined">delete</span>
+            </DeleteButton>
+          </IconContainer>
+        ) : null}
       </CardDescription>
     </CardWrapper>
   );

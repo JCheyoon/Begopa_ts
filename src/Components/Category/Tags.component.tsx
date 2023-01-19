@@ -1,9 +1,9 @@
 import { TagBubble } from "./Tag.style";
 
 interface props {
-  big: string;
+  big: boolean;
   name: string;
-  onClick: () => {};
+  onClick: () => void;
 }
 const Tag = ({ big, name, onClick }: props) => {
   return (

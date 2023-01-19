@@ -62,7 +62,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
         photoUrl: fetchedRecipe.photoUrl,
         cookingTime: fetchedRecipe.cookingTime,
         servings: fetchedRecipe.servings,
-        public: fetchedRecipe.public,
+        isPublic: fetchedRecipe.isPublic,
         instructions: fetchedRecipe.instructions,
         tags: fetchedRecipe.tags,
         ingredients: fetchedRecipe.ingredients,
@@ -127,7 +127,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
       } else {
         response = await saveNewRecipe(fixedValues, id);
       }
-      navigate(`/recipe/${response.data.id}?public=${values.public}`);
+      navigate(`/recipe/${response.data.id}?public=${values.isPublic}`);
     } catch (e: any) {
       console.log("error", e.response.data.message);
     } finally {
@@ -333,7 +333,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
                     type="checkbox"
                     name="public"
                     id="public"
-                    checked={values.public}
+                    checked={values.isPublic}
                     onChange={handleChange}
                   />
                   <label htmlFor="public">

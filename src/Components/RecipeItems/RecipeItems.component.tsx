@@ -26,7 +26,7 @@ const RecipeItems = ({
   tags,
   id,
 }: RecipeType) => {
-  const [servingValue, setServingValue] = useState(servings);
+  const [servingValue, setServingValue] = useState<number>(servings);
   const [multiplier, setMultiplier] = useState(1);
 
   const changeCreateTime = (string: string) => {
@@ -34,12 +34,18 @@ const RecipeItems = ({
     return date.toLocaleDateString();
   };
   const increaseAmount = () => {
+    if (!servings) {
+      return;
+    }
     const newServings = servingValue + 1;
     setServingValue(newServings);
     setMultiplier(newServings / servings);
   };
 
   const decreaseAmount = () => {
+    if (!servings) {
+      return;
+    }
     const newServings = servingValue - 1;
     if (newServings === 0) return;
     setMultiplier(newServings / servings);

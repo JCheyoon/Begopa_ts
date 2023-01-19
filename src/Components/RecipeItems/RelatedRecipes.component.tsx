@@ -25,7 +25,7 @@ const RelatedRecipes = ({ tags, id }: Props) => {
     <RelatedRecipeContainer>
       <h1>Related recipes</h1>
       {relatedRecipes.length ? (
-        relatedRecipes.map(({ id, photoUrl, name, public: isPublic }) => (
+        relatedRecipes.map(({ id, photoUrl, name, isPublic: isPublic }) => (
           <RelatedRecipe key={id}>
             <Link to={`/recipe/${id}?public=${isPublic}`}>
               <RelateRecipePic photoUrl={photoUrl} />

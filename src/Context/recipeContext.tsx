@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAxios } from "../Components/Hook/useAxios";
-import { RecipeType, Tags } from "./Types";
+import { MyRecipeType, RecipeType, Tags } from "./Types";
 import { useContextAuth } from "./authContext";
 
 type RecipeContextType = {
+  tags: Tags;
   allRecipes: RecipeType[];
   fetchAllRecipes: () => Promise<void>;
   filterByName: (searchField: string) => void;
@@ -17,6 +18,10 @@ type RecipeContextType = {
   ) => Promise<any>;
   getRelatedRecipes: (tags: string[], id: string) => RecipeType[];
   fetchInitialRecipes: () => Promise<void>;
+  filterByTag: (tag: string) => void;
+  filteredRecipes: RecipeType[];
+  deleteRecipe: (id: string, token?: string) => Promise<any>;
+  fetchMyRecipes: () => Promise<void>;
 };
 
 type ProviderProps = {
@@ -53,7 +58,7 @@ const RecipeContext = createContext({} as RecipeContextType);
 
 export const RecipeProvider = ({ children }: ProviderProps) => {
   const { token, isLoggedIn } = useContextAuth();
-  const [myRecipes, setMyRecipes] = useState([]);
+  const [myRecipes, setMyRecipes] = useState<MyRecipeType[]>([]);
   const { post, get, put, remove } = useAxios();
   const [allRecipes, setAllRecipes] = useState<RecipeType[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<RecipeType[]>([]);
@@ -62,12 +67,24 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     others: [],
   });
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setMyRecipes([]);
+    }
+  }, [isLoggedIn]);
+
   const fetchInitialRecipes = async () => {
     const response = await get("/recipe/list");
     if (!response?.data) return;
     setAllRecipes([...response.data]);
     setFilteredRecipes([...response.data.slice(0, 6)]);
     setTags(createTags(response.data));
+  };
+
+  const fetchMyRecipes = async () => {
+    const response = await get("/recipe/my-list", token);
+    if (!response?.data) return;
+    setMyRecipes([...response.data]);
   };
 
   const fetchAllRecipes = async () => {
@@ -83,6 +100,11 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
       return recipe.name.toLowerCase().includes(searchField);
     });
     setFilteredRecipes(filtered);
+  };
+
+  const deleteRecipe = (id: string, token?: string) => {
+    if (!token) return;
+    return remove(`/recipe/${id}`, token);
   };
 
   const saveNewRecipe = (
@@ -108,6 +130,13 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     return filtered.slice(0, 3);
   };
 
+  const filterByTag = (tag: string) => {
+    const filtered = allRecipes.filter((recipe) => {
+      return recipe.tags.includes(tag);
+    });
+    setFilteredRecipes(filtered);
+  };
+
   const value = {
     filterByName,
     fetchAllRecipes,
@@ -116,6 +145,11 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     getRelatedRecipes,
     allRecipes,
     fetchInitialRecipes,
+    tags,
+    filterByTag,
+    filteredRecipes,
+    deleteRecipe,
+    fetchMyRecipes,
   };
 
   return (
