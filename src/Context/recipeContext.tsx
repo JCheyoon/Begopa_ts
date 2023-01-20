@@ -20,8 +20,9 @@ type RecipeContextType = {
   fetchInitialRecipes: () => Promise<void>;
   filterByTag: (tag: string) => void;
   filteredRecipes: RecipeType[];
-  deleteRecipe: (id: string, token?: string) => Promise<any>;
+  deleteRecipe: (id: string) => Promise<any>;
   fetchMyRecipes: () => Promise<void>;
+  myRecipes: MyRecipeType[];
 };
 
 type ProviderProps = {
@@ -102,8 +103,9 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     setFilteredRecipes(filtered);
   };
 
-  const deleteRecipe = (id: string, token?: string) => {
+  const deleteRecipe = (id: string) => {
     if (!token) return;
+
     return remove(`/recipe/${id}`, token);
   };
 
@@ -150,6 +152,7 @@ export const RecipeProvider = ({ children }: ProviderProps) => {
     filteredRecipes,
     deleteRecipe,
     fetchMyRecipes,
+    myRecipes,
   };
 
   return (

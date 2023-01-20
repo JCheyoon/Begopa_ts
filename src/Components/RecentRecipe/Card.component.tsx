@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { RecentRecipeType } from "../../Context/Types";
 import { useContextRecipe } from "../../Context/recipeContext";
+import { useContextModal } from "../../Context/modalContext";
 
 const Card = ({
   name,
@@ -23,14 +24,14 @@ const Card = ({
 }: RecentRecipeType) => {
   const navigate = useNavigate();
   const { deleteRecipe, fetchMyRecipes } = useContextRecipe();
+  const { showConfirmation } = useContextModal();
 
   const clickRemoveHandler = () => {
-    console.log("remove");
-    // showConfirmation({
-    //   title: "Warning",
-    //   message: "Are you sure you want to delete this recipe?",
-    //   confirmHandler: () => removeRecipe,
-    // });
+    showConfirmation({
+      title: "Warning",
+      message: "Are you sure you want to delete this recipe?",
+      confirmHandler: () => removeRecipe,
+    });
   };
 
   const removeRecipe = async () => {

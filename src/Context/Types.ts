@@ -63,3 +63,9 @@ export interface MyRecipeType {
   servings: number;
   ingredients: Ingredient[];
 }
+
+export interface ModalType {
+  title: string;
+  message: string;
+  confirmHandler?: () => void;
+}
