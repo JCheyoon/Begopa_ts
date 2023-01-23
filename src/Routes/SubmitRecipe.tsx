@@ -13,6 +13,8 @@ import { Ref, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useContextRecipe } from "../Context/recipeContext";
 import { useAxios } from "../Components/Hook/useAxios";
+import { useContextModal } from "../Context/modalContext";
+import { RecipeInputSchema } from "./recipeValidation";
 
 interface Props {
   isEditMode?: Boolean;
@@ -46,6 +48,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
   const navigate = useNavigate();
   const [fetchedRecipe, setFetchedRecipe] = useState<RecipeType>();
   const { saveNewRecipe, updateRecipe } = useContextRecipe();
+  const { showModalHandler } = useContextModal();
 
   useEffect(() => {
     if (!id || !isEditMode) return;
@@ -79,6 +82,7 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
       );
       setFetchedRecipe(response.data);
     } catch (e: any) {
+      showModalHandler({ title: "Error", message: "Could not fetch recipe" });
       console.log(e.response.data.message);
     } finally {
       setLoading(false);
@@ -142,6 +146,8 @@ const SubmitRecipe = ({ isEditMode }: Props) => {
           initialValues={initialValues}
           onSubmit={submitForm}
           innerRef={formRef as unknown as Ref<FormikProps<RecipeType>>}
+          validationSchema={RecipeInputSchema}
+          validateOnChange={true}
         >
           {({
             values,

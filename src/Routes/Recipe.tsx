@@ -10,6 +10,7 @@ import { useContextAuth } from "../Context/authContext";
 import RecipeHeader from "../Components/RecipeItems/RecipeHeader.component";
 import Spinner from "../Components/Spinner/Spinner.component";
 import { RecipeType } from "../Context/Types";
+import { useContextModal } from "../Context/modalContext";
 
 const Recipe = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const Recipe = () => {
   const { token } = useContextAuth();
   const [recipe, setRecipe] = useState<RecipeType>();
   const [loading, setLoading] = useState(false);
+  const { showModalHandler } = useContextModal();
 
   useEffect(() => {
     if (!id) return;
@@ -39,6 +41,7 @@ const Recipe = () => {
       );
       setRecipe(response.data);
     } catch (e: any) {
+      showModalHandler({ title: "Error", message: "Could not fetch recipe" });
       console.log(e.response.data.message);
     } finally {
       setLoading(false);

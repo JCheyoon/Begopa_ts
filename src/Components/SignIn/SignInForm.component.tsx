@@ -7,6 +7,7 @@ import { useAxios } from "../Hook/useAxios";
 import { useContextAuth } from "../../Context/authContext";
 import { useNavigate } from "react-router-dom";
 import { LoginRequest } from "../../Context/Types";
+import { useContextModal } from "../../Context/modalContext";
 
 const defaultFormValue: LoginRequest = {
   email: "",
@@ -25,6 +26,7 @@ const SignInForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const { email, password } = formFields;
   const navigate = useNavigate();
+  const { showModalHandler } = useContextModal();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -33,16 +35,47 @@ const SignInForm = () => {
         const response = await post<LoginRequest>("/user/login", formFields);
         handleLogin(response.data);
         navigate("/");
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
+        if (e?.response?.data?.message === "INVALID_CREDENTIALS") {
+          showModalHandler({
+            title: "User Error",
+            message: "Incorrect password or email",
+          });
+        } else if (
+          e?.response?.data?.message[0]?.message === "INVALID_FORMAT"
+        ) {
+          const invalidField = e.response.data.message[0].path;
+          showModalHandler({
+            title: "Invalid Format",
+            message: `The format of ${invalidField} is not valid.`,
+          });
+        } else {
+          showModalHandler({
+            title: "Error",
+            message: "shit happened at login",
+          });
+        }
       }
     } else if (formType === FormType.SIGNUP) {
       try {
         const response = await post<LoginRequest>("/user/signup", formFields);
         setFormType(FormType.LOGIN);
         resetForm();
-      } catch (e) {
-        console.log(e);
+      } catch (e: any) {
+        switch (e.response.data.message) {
+          case "EMAIL_REGISTERED":
+            showModalHandler({
+              title: "Already registered",
+              message: "This email already registered",
+            });
+            break;
+          default:
+            showModalHandler({
+              title: "Error",
+              message: "shit happened at signup",
+            });
+        }
       }
     }
   };

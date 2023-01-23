@@ -6,10 +6,12 @@ import ScrollUp from "../Components/ScrollUp/ScrollUp.component";
 import { useContextRecipe } from "../Context/recipeContext";
 import { useEffect, useState } from "react";
 import Spinner from "../Components/Spinner/Spinner.component";
+import { useContextModal } from "../Context/modalContext";
 
 const Home = () => {
   const { fetchInitialRecipes } = useContextRecipe();
   const [loading, setLoading] = useState(false);
+  const { showModalHandler } = useContextModal();
 
   useEffect(() => {
     fetchRecents();
@@ -20,6 +22,11 @@ const Home = () => {
     try {
       await fetchInitialRecipes();
     } catch (e: any) {
+      showModalHandler({
+        title: "Error",
+        message: "Could not fetch recent recipe",
+      });
+
       console.log(e.response.data.message);
     } finally {
       setLoading(false);
